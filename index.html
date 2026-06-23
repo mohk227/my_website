@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إيلاف | لجمال مغربي أصيل</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        forest: {
+                            50: '#f2f8f5',
+                            100: '#e1efe9',
+                            800: '#112e22',
+                            900: '#0b1f16',
+                            950: '#050c09'
+                        },
+                        gold: { 400: '#e5c158', 500: '#D4AF37', 600: '#AA8515' },
+                        emeraldBrand: '#1b804e'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-[#fcfdfc] text-gray-900 dark:bg-forest-950 dark:text-gray-100 min-h-screen font-sans pb-24 transition-colors duration-300">
+
+    <!-- Header / شريط الهيدر العلوي -->
+    <header class="border-b border-gray-100 dark:border-forest-900 sticky top-0 bg-white/90 dark:bg-forest-950/90 backdrop-blur z-40 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-white dark:bg-forest-900 rounded-xl p-1.5 w-12 h-12 flex items-center justify-center shadow-sm overflow-hidden border border-gray-100 dark:border-forest-800">
+                    <img src="1000027558_2.jpg" alt="لوجو إيلاف" class="w-full h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="hidden flex-col items-center justify-center text-emeraldBrand dark:text-gold-400 font-bold text-xs leading-none">
+                        <span>🌿</span>
+                        <span class="text-[9px] mt-0.5">إيلاف</span>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold text-emeraldBrand dark:text-gold-400 tracking-wide" id="site-logo-text">إيلاف</h1>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500" data-i18n="tagline">للجمال المغربي الأصيل</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="theme-btn" class="p-2 bg-gray-100 dark:bg-forest-900 rounded-xl text-sm transition-transform active:scale-95">🌓</button>
+                <button id="lang-btn" class="p-2 bg-gray-100 dark:bg-forest-900 rounded-xl font-bold text-xs transition-transform active:scale-95">EN</button>
+                <button id="auth-btn" class="bg-emeraldBrand text-white px-3 py-2 rounded-xl text-xs font-bold transition-transform active:scale-95"></button>
+            </div>
+        </div>
+    </header>
+
+    <!-- الحاوية الرئيسية المتجاوبة -->
+    <main class="max-w-6xl mx-auto px-4 pt-4 space-y-6">
+        
+        <!-- لوحة تحكم الملاك المتقدمة -->
+        <section id="admin-panel" class="hidden p-4 border border-gold-500/30 rounded-2xl bg-forest-900/10 dark:bg-forest-900/20 backdrop-blur-md space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-200 dark:border-forest-800 pb-2">
+                <h2 class="text-sm font-bold text-gold-400 flex items-center gap-1">👑 <span data-i18n="adminPanel">لوحة المالك</span></h2>
+                <button onclick="toggleSettingsModal()" class="text-[11px] bg-gray-200 dark:bg-forest-800 px-2 py-1 rounded-lg">⚙️ إعدادات الحساب</button>
+            </div>
+            
+            <div class="grid grid-cols-4 gap-1 text-[10px] sm:text-[11px]">
+                <button id="tab-prod-btn" onclick="switchAdminTab('prod')" class="bg-emeraldBrand text-white p-2 rounded-lg font-bold transition-all">إضافة منتج</button>
+                <button id="tab-manage-btn" onclick="switchAdminTab('manage')" class="bg-gray-100 dark:bg-forest-800 p-2 rounded-lg font-bold transition-all">إدارة وتعديل</button>
+                <button id="tab-orders-btn" onclick="switchAdminTab('orders')" class="bg-gray-100 dark:bg-forest-800 p-2 rounded-lg font-bold flex justify-center items-center gap-1 transition-all">
+                    <span>الطلبات</span>
+                    <span id="order-count" class="bg-red-500 text-white px-1.5 rounded-full text-[9px]">0</span>
+                </button>
+                <button id="tab-returns-btn" onclick="switchAdminTab('returns')" class="bg-gray-100 dark:bg-forest-800 p-2 rounded-lg font-bold flex justify-center items-center gap-1 transition-all">
+                    <span>المرتجعات</span>
+                    <span id="admin-returns-count" class="bg-amber-500 text-white px-1.5 rounded-full text-[9px]">0</span>
+                </button>
+            </div>
+
+            <!-- تبويب: إضافة / تعديل منتج -->
+            <div id="admin-prod-tab" class="space-y-2 max-w-md">
+                <form id="add-product-form" onsubmit="handleProductSubmit(event)" class="space-y-2 text-xs">
+                    <input type="hidden" id="edit-product-id" value="">
+                    <input type="text" id="p-title" placeholder="اسم المنتج المغربي (مثال: أركان نقي)" class="w-full p-2.5 rounded-xl bg-white dark:bg-forest-900 border border-gray-200 dark:border-forest-800 text-sm text-right focus:border-emeraldBrand focus:outline-none" required>
+                    <textarea id="p-desc" placeholder="وصف المنتج، المكونات، وطريقة الاستخدام..." class="w-full p-2.5 rounded-xl bg-white dark:bg-forest-900 border border-gray-200 dark:border-forest-800 text-right focus:border-emeraldBrand focus:outline-none" required></textarea>
+                    <input type="number" id="p-price" placeholder="السعر المطلوب (بالجنيه المصري)" class="w-full p-2.5 rounded-xl bg-white dark:bg-forest-900 border border-gray-200 dark:border-forest-800 text-right focus:border-emeraldBrand focus:outline-none" required>
+                    <div class="bg-white dark:bg-forest-900 p-2.5 rounded-xl border border-gray-200 dark:border-forest-800 text-right">
+                        <label class="block text-[11px] text-gray-400 mb-1">صورة المنتج:</label>
+                        <input type="file" id="p-file" accept="image/*" class="w-full text-[11px] cursor-pointer">
+                    </div>
+                    <button type="submit" id="form-submit-btn" class="w-full bg-gold-500 text-forest-950 font-bold p-2.5 rounded-xl hover:bg-gold-400 transition-colors">حفظ ونشر المنتج في المتجر</button>
+                    <button type="button" id="cancel-edit-btn" onclick="cancelEditMode()" class="w-full bg-gray-300 dark:bg-forest-800 text-gray-700 dark:text-gray-300 p-2 rounded-xl hidden">إلغاء التعديل</button>
+                </form>
+            </div>
+
+            <!-- تبويب: إدارة المنتجات -->
+            <div id="admin-manage-tab" class="hidden space-y-2 max-w-xl">
+                <div id="manage-products-list" class="space-y-2 max-h-64 overflow-y-auto no-scrollbar"></div>
+            </div>
+
+            <!-- تبويب: قائمة الطلبات المشتراة -->
+            <div id="admin-orders-tab" class="hidden space-y-2 max-w-xl">
+                <div id="orders-list" class="space-y-2 max-h-64 overflow-y-auto no-scrollbar"></div>
+            </div>
+
+            <!-- تبويب: قائمة طلبات المرتجعات -->
+            <div id="admin-returns-tab" class="hidden space-y-2 max-w-xl">
+                <div id="admin-returns-list" class="space-y-2 max-h-64 overflow-y-auto no-scrollbar"></div>
+            </div>
+
+            <!-- إضافة الملاك الجدد -->
+            <div id="primary-owner-only-form" class="hidden border-t border-gray-200 dark:border-forest-800 pt-3 mt-2 text-right max-w-md">
+                <p class="text-[11px] text-gold-500 font-bold mb-1">➕ منح صلاحيات مالك مسؤول جديد:</p>
+                <div class="flex gap-2">
+                    <input type="tel" id="new-owner-phone" placeholder="أدخل رقم الهاتف" class="bg-white dark:bg-forest-900 border border-gray-200 dark:border-forest-800 p-2 rounded-xl text-xs flex-1 text-left font-mono focus:outline-none">
+                    <button onclick="addNewOwner()" class="bg-emeraldBrand text-white px-4 rounded-xl text-xs font-bold active:scale-95 transition-transform">إضافة وصلاحية</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- البانر الإعلاني الكبير -->
+        <section class="bg-gradient-to-br from-emeraldBrand to-emerald-700 dark:from-emeraldBrand dark:to-forest-800 text-white p-8 rounded-3xl relative overflow-hidden shadow-lg text-right">
+            <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+            <h2 class="text-2xl md:text-3xl font-extrabold leading-tight" data-i18n="bannerTitle">أركان ذهبي ونقاء أصيل</h2>
+            <p class="text-xs md:text-sm text-emerald-100/80 mt-2 max-w-[85%]" data-i18n="bannerDesc">منتجات مغربية طبيعية مستخلصة بعناية فائقة لتعكس روعة العناية التقليدية.</p>
+        </section>
+
+        <!-- شريط البحث المباشر -->
+        <section class="relative max-w-md">
+            <span class="absolute inset-y-0 right-3 flex items-center text-gray-400">🔍</span>
+            <input type="text" id="search-input" oninput="filterProducts(this.value)" placeholder="ابحث عن منتج طبيعي مغربي..." class="w-full pr-10 pl-4 py-3 bg-gray-100 dark:bg-forest-900 rounded-2xl text-sm focus:outline-none border border-transparent focus:border-emeraldBrand/40 transition-all text-right">
+        </section>
+
+        <!-- الأقسام -->
+        <section class="space-y-2 text-right">
+            <h3 class="text-xs font-bold text-gray-400 tracking-wide" data-i18n="categories">الأقسام الرئيسية</h3>
+            <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
+                <button class="bg-emeraldBrand text-white px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap" data-i18n="catAll">الكل</button>
+                <button class="bg-gray-100 dark:bg-forest-900 text-gray-600 dark:text-gray-300 px-4 py-2 rounded-xl text-xs whitespace-nowrap" data-i18n="catOils">الزيوت الطبيعية</button>
+                <button class="bg-gray-100 dark:bg-forest-900 text-gray-600 dark:text-gray-300 px-4 py-2 rounded-xl text-xs whitespace-nowrap" data-i18n="catSoap">الصابون والتقشير</button>
+            </div>
+        </section>
+
+        <!-- شبكة المنتجات الرئيسية -->
+        <section class="space-y-3 text-right">
+            <h3 class="text-sm font-bold text-emeraldBrand dark:text-gold-400" data-i18n="ourProducts">منتجاتنا الأصيلة</h3>
+            <div id="products-container" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+            <div id="no-products-msg" class="text-center py-12 text-gray-400 text-xs italic hidden" data-i18n="noProductsMsg">المتجر فارغ حالياً.</div>
+        </section>
+    </main>
+
+    <!-- النافذة الجانبية: المفضلة -->
+    <div id="fav-drawer" class="fixed inset-y-0 right-0 max-w-sm w-full bg-white dark:bg-forest-950 z-50 shadow-2xl transform translate-x-full transition-transform duration-300 p-4 flex flex-col justify-between text-right border-l border-gray-100 dark:border-forest-900">
+        <div class="flex flex-col h-full"><div class="flex justify-between items-center border-b pb-3 mb-4"><button onclick="toggleDrawer('fav')" class="text-gray-400 text-lg">✕</button><h3 class="font-bold text-emeraldBrand dark:text-gold-400">🤍 <span data-i18n="navFav">المفضلة</span></h3></div><div id="fav-items-container" class="space-y-3 overflow-y-auto flex-1 no-scrollbar"></div></div>
+    </div>
+
+    <!-- النافذة الجانبية: السلة -->
+    <div id="cart-drawer" class="fixed inset-y-0 right-0 max-w-sm w-full bg-white dark:bg-forest-950 z-50 shadow-2xl transform translate-x-full transition-transform duration-300 p-4 flex flex-col justify-between text-right border-l border-gray-100 dark:border-forest-900">
+        <div class="flex flex-col h-full justify-between">
+            <div class="flex flex-col flex-1 overflow-hidden"><div class="flex justify-between items-center border-b pb-3 mb-4"><button onclick="toggleDrawer('cart')" class="text-gray-400 text-lg">✕</button><h3 class="font-bold text-emeraldBrand dark:text-gold-400">🛒 <span data-i18n="navCart">السلة</span></h3></div><div id="cart-items-container" class="space-y-3 overflow-y-auto flex-1 no-scrollbar"></div></div>
+            <div class="border-t pt-4 space-y-3 bg-white dark:bg-forest-950 mt-2"><div class="flex justify-between items-center font-bold text-sm"><span id="cart-total-price" class="text-emeraldBrand dark:text-gold-400 font-mono text-base">0 ج.م</span><span>الإجمالي:</span></div><button onclick="openCheckoutFromCart()" class="w-full bg-emeraldBrand text-white py-3.5 rounded-xl font-bold text-xs">تأكيد وشراء السلة</button></div>
+        </div>
+    </div>
+
+    <!-- النافذة الجانبية: مركز المرتجعات التفاعلي -->
+    <div id="returns-drawer" class="fixed inset-y-0 right-0 max-w-sm w-full bg-white dark:bg-forest-950 z-50 shadow-2xl transform translate-x-full transition-transform duration-300 p-4 flex flex-col text-right border-l border-gray-100 dark:border-forest-900">
+        <div class="flex justify-between items-center border-b pb-3 mb-3">
+            <button onclick="toggleDrawer('returns')" class="text-gray-400 text-lg">✕</button>
+            <h3 class="font-bold text-emeraldBrand dark:text-gold-400">🔄 <span data-i18n="navReturns">مركز المرتجعات الذكي</span></h3>
+        </div>
+        <div class="space-y-4 text-xs overflow-y-auto flex-1 no-scrollbar">
+            <div class="bg-gray-50 dark:bg-forest-900/40 p-3 rounded-xl border border-gray-100 dark:border-forest-900 text-[11px] text-gray-500">
+                💡 <span class="font-bold text-emeraldBrand dark:text-gold-400">سياسة الـ 7 أيام:</span> يسمح بتقديم طلب إرجاع للمنتجات السليمة وغير المفتوحة خلال مدة أقصاها 7 أيام من تاريخ الاستلام.
+            </div>
+            <div class="space-y-2 border-b pb-3 border-gray-100 dark:border-forest-900">
+                <label class="block font-bold text-gray-700 dark:text-gray-300">أدخل رقم هاتف الطلب لتحديد المنتج:</label>
+                <div class="flex gap-1.5">
+                    <input type="tel" id="return-search-phone" placeholder="مثال: 010..." class="bg-gray-50 dark:bg-forest-900 border p-2.5 rounded-xl text-left font-mono flex-1 text-xs focus:outline-none">
+                    <button onclick="findUserOrdersForReturn()" class="bg-emeraldBrand text-white px-3 rounded-xl text-[11px] font-bold">ابحث</button>
+                </div>
+            </div>
+            <div id="returnable-orders-container" class="space-y-2 hidden">
+                <p class="font-bold text-emeraldBrand dark:text-gold-400 text-[11px]">📦 اختر المنتج المراد إرجاعه:</p>
+                <div id="returnable-list" class="space-y-1.5 max-h-48 overflow-y-auto no-scrollbar"></div>
+            </div>
+            <form id="submit-return-form" onsubmit="handleReturnFormSubmit(event)" class="space-y-2.5 hidden">
+                <input type="hidden" id="selected-order-id">
+                <input type="hidden" id="selected-product-text">
+                <div>
+                    <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">سبب طلب الإرجاع أو الاستبدال:</label>
+                    <select id="return-reason" class="w-full p-2.5 bg-gray-50 dark:bg-forest-900 border rounded-xl text-xs focus:outline-none" required>
+                        <option value="">-- اختر السبب --</option>
+                        <option value="damaged">المنتج تالف أو به عيب تصنيع</option>
+                        <option value="wrong">استلمت منتجاً خاطئاً ليس كما بالوصف</option>
+                        <option value="not_liked">لم يعد العميل بحاجة إليه / لم يعجبه</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">ملاحظات إضافية للمالك:</label>
+                    <textarea id="return-notes" placeholder="اكتب تفاصيل إضافية لتسريع الموافقة..." class="w-full p-2.5 bg-gray-50 dark:bg-forest-900 border rounded-xl text-xs focus:outline-none"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-amber-500 text-forest-950 font-bold py-3 rounded-xl text-xs transition-transform active:scale-95 shadow-sm">إرسال طلب المرتجع الفوري</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- شريط التثبيت السفلي -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-forest-950/95 backdrop-blur border-t py-2 px-4 z-40 shadow-2xl">
+        <div class="max-w-md mx-auto flex justify-between items-center text-center">
+            <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="flex flex-col items-center gap-1 text-emeraldBrand dark:text-gold-400 flex-1"><span class="text-xl">🏠</span><span class="text-[10px] font-bold" data-i18n="navHome">الرئيسية</span></button>
+            <button onclick="toggleDrawer('fav')" class="flex flex-col items-center gap-1 text-gray-400 flex-1 relative"><span class="text-xl">🤍</span><span id="fav-badge" class="absolute top-0 right-1/2 translate-x-3 bg-red-500 text-white text-[8px] px-1.5 py-0.5 rounded-full hidden">0</span><span class="text-[10px]" data-i18n="navFav">المفضلة</span></button>
+            <button onclick="toggleDrawer('cart')" class="flex flex-col items-center gap-1 text-gray-400 flex-1 relative"><span class="text-xl">🛒</span><span id="cart-badge" class="absolute top-0 right-1/2 translate-x-3 bg-emeraldBrand text-white text-[8px] px-1.5 py-0.5 rounded-full hidden">0</span><span class="text-[10px]" data-i18n="navCart">السلة</span></button>
+            <button onclick="toggleDrawer('returns')" class="flex flex-col items-center gap-1 text-gray-400 flex-1"><span class="text-xl">🔄</span><span class="text-[10px]" data-i18n="navReturns">المرتجعات</span></button>
+        </div>
+    </nav>
+
+    <!-- النوافذ المنبثقة المساعدة -->
+    <div id="auth-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-forest-900 p-5 rounded-3xl max-w-xs w-full relative text-right shadow-2xl">
+            <button onclick="toggleAuthModal()" class="absolute top-4 left-4 text-gray-400">✕</button>
+            <h3 class="text-lg font-bold mb-4 text-center text-emeraldBrand dark:text-gold-400" data-i18n="loginTitle">تسجيل الدخول</h3>
+            <form onsubmit="handleLogin(event)" class="space-y-3 text-xs">
+                <input type="tel" id="login-phone" placeholder="أدخل رقم الهاتف (مثال: 010...)" class="w-full p-2.5 rounded-xl bg-gray-50 dark:bg-forest-950 border text-left font-mono focus:outline-none" required>
+                <div id="pass-field" class="hidden">
+                    <input type="password" id="login-pass" placeholder="أدخل كلمة المرور" class="w-full p-2.5 rounded-xl bg-gray-50 dark:bg-forest-950 border text-left focus:outline-none">
+                </div>
+                <button type="submit" class="w-full bg-emeraldBrand text-white p-2.5 rounded-xl font-bold" data-i18n="loginBtn">تأكيد الدخول</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="order-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-forest-900 p-5 rounded-3xl max-w-xs w-full relative text-right shadow-2xl">
+            <button onclick="toggleOrderModal()" class="absolute top-4 left-4 text-gray-400">✕</button>
+            <h3 class="text-md font-bold mb-1 text-emeraldBrand dark:text-gold-400" data-i18n="confirmOrder">تأكيد شحن طلبك</h3>
+            <p id="target-product-details" class="text-[11px] text-gray-400 mb-3 bg-gray-50 dark:bg-forest-950 p-2 rounded-lg"></p>
+            <form onsubmit="submitOrder(event)" class="space-y-3 text-xs">
+                <input type="text" id="order-address" placeholder="عنوان التوصيل بالتفصيل" class="w-full p-2.5 rounded-xl bg-gray-50 dark:bg-forest-950 border text-right focus:outline-none" required>
+                <input type="tel" id="order-phone" placeholder="رقم اتصال بديل" class="w-full p-2.5 rounded-xl bg-gray-50 dark:bg-forest-950 border text-left focus:outline-none" required>
+                <button type="submit" class="w-full bg-emeraldBrand text-white p-2.5 rounded-xl font-bold" data-i18n="sendOrder">إرسال الطلب</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة إعدادات المالك المتطورة (تغيير كلمة السر وتغيير رقم الهاتف) -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-forest-900 p-5 rounded-3xl max-w-xs w-full relative text-right shadow-2xl">
+            <button onclick="toggleSettingsModal()" class="absolute top-4 left-4 text-gray-400">✕</button>
+            <h3 class="text-sm font-bold mb-4 text-emeraldBrand dark:text-gold-400 border-b pb-1">⚙️ إعدادات حساب المالك</h3>
+            
+            <div class="space-y-4 text-xs">
+                <!-- قسم تغيير رقم الهاتف -->
+                <div class="space-y-1.5">
+                    <label class="block font-bold text-gray-600 dark:text-gray-400">تغيير رقم هاتف المالك الحالي:</label>
+                    <input type="tel" id="new-owner-self-phone" placeholder="أدخل رقم هاتفك الجديد" class="w-full p-2.5 rounded-xl bg-gray-50 dark:bg-forest-950 border text-left font-mono focus:outline-none">
+                    <button onclick="saveNewOwnerPhone()" class="w-full bg-amber-500 text-forest-950 p-2 rounded-xl text-[11px] font-bold">تحديث رقم الهاتف</button>
+                </div>
+                
+                <hr class="border-gray-100 dark:border-forest-800">
+                
+                <!-- قسم تغيير كلمة السر -->
+                <div class="space-y-1.5">
+                    <label class="block font-bold text-gray-600 dark:text-gray-400">تغيير كلمة المرور للوحة التحكم:</label>
+                    <input type="password" id="new-pass" placeholder="أدخل كلمة المرور الجديدة" class="w-full p-2.5 rounded-xl bg-gray-50 dark:bg-forest-950 border text-right focus:outline-none">
+                    <button onclick="saveNewPassword()" class="w-full bg-emeraldBrand text-white p-2 rounded-xl text-[11px] font-bold">تحديث كلمة السر</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- السكريبتات وإدارة العمليات التفاعلية وقاعدة البيانات -->
+    <script>
+        let ownersList = JSON.parse(localStorage.getItem('elaf_owners_list')) || ['01060091916'];
+        let PRIMARY_OWNER = ownersList[0]; // المالك الرئيسي يكون أول رقم في القائمة دائماً
+        
+        let currentLang = 'ar';
+        let currentUser = JSON.parse(sessionStorage.getItem('elaf_active_user')) || null;
+        let adminPassword = localStorage.getItem('elaf_admin_pass') || '12345678';
+        
+        let products = JSON.parse(localStorage.getItem('elaf_products')) || [];
+        let orders = JSON.parse(localStorage.getItem('elaf_orders')) || [];
+        let returnRequests = JSON.parse(localStorage.getItem('elaf_return_requests')) || [];
+        let cartItems = JSON.parse(localStorage.getItem('elaf_cart_items')) || [];
+        let favItems = JSON.parse(localStorage.getItem('elaf_fav_items')) || [];
+
+        const i18n = {
+            ar: {
+                logo: "إيلاف", tagline: "للجمال المغربي الأصيل", ourProducts: "منتجاتنا الأصيلة",
+                login: "دخول", logout: "خروج", loginTitle: "تسجيل الدخول",
+                bannerTitle: "أركان ذهبي ونقاء أصيل", bannerDesc: "منتجات مغربية طبيعية مستخلصة بعناية فائقة لتعكس روعة العناية التقليدية.",
+                categories: "الأقسام الرئيسية", catAll: "الكل", catOils: "الزيوت الطبيعية", catSoap: "الصابون والتقشير",
+                adminPanel: "لوحة المالك", confirmOrder: "تأكيد شحن طلبك", sendOrder: "إرسال الطلب",
+                noProductsMsg: "المتجر فارغ حالياً.", navHome: "الرئيسية", navFav: "المفضلة", navCart: "السلة", navReturns: "المرتجعات"
+            },
+            en: {
+                logo: "Elaf", tagline: "Authentic Moroccan Beauty", ourProducts: "Our Authentic Products",
+                login: "Login", logout: "Logout", loginTitle: "Sign In",
+                bannerTitle: "Golden Argan & Pure Luxury", bannerDesc: "Natural Moroccan products carefully extracted to reflect traditional care.",
+                categories: "Categories", catAll: "All", catOils: "Natural Oils", catSoap: "Soaps",
+                adminPanel: "Owner Panel", confirmOrder: "Confirm Order", sendOrder: "Submit",
+                noProductsMsg: "The shop is empty.", navHome: "Home", navFav: "Favorites", navCart: "Cart", navReturns: "Returns"
+            }
+        };
+
+        window.onload = () => {
+            updateLanguageUI();
+            renderProducts(products);
+            checkUserStatus();
+            setupPhoneAuthListeners();
+            updateBadges();
+        };
+
+        document.getElementById('theme-btn').addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            document.getElementById('theme-btn').innerText = isDark ? '☀️' : '🌙';
+        });
+
+        document.getElementById('lang-btn').addEventListener('click', () => {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            document.getElementById('lang-btn').innerText = currentLang === 'ar' ? 'EN' : 'AR';
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            updateLanguageUI();
+        });
+
+        function updateLanguageUI() {
+            document.getElementById('site-logo-text').innerText = i18n[currentLang].logo;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[currentLang][key]) el.innerText = i18n[currentLang][key];
+            });
+        }
+
+        function checkUserStatus() {
+            const authBtn = document.getElementById('auth-btn');
+            if (currentUser) {
+                authBtn.innerText = i18n[currentLang].logout;
+                authBtn.onclick = handleLogout;
+                if (ownersList.includes(currentUser.phone)) {
+                    document.getElementById('admin-panel').classList.remove('hidden');
+                    renderOrders();
+                    renderManageProducts();
+                    renderAdminReturnsList();
+                    if (currentUser.phone === PRIMARY_OWNER) document.getElementById('primary-owner-only-form').classList.remove('hidden');
+                }
+            } else {
+                authBtn.innerText = i18n[currentLang].login;
+                authBtn.onclick = () => toggleAuthModal();
+                document.getElementById('admin-panel').classList.add('hidden');
+            }
+        }
+
+        function toggleAuthModal() {
+            document.getElementById('auth-modal').classList.toggle('hidden');
+            document.getElementById('auth-modal').classList.toggle('flex');
+            document.getElementById('pass-field').classList.add('hidden');
+        }
+
+        function setupPhoneAuthListeners() {
+            document.getElementById('login-phone').addEventListener('input', (e) => {
+                const inputNum = e.target.value.replace(/\s+/g, '');
+                if (ownersList.includes(inputNum)) document.getElementById('pass-field').classList.remove('hidden');
+                else document.getElementById('pass-field').classList.add('hidden');
+            });
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const phone = document.getElementById('login-phone').value.replace(/\s+/g, '');
+            const pass = document.getElementById('login-pass').value;
+            if (ownersList.includes(phone)) {
+                if (pass === adminPassword) currentUser = { phone: phone, role: 'owner' };
+                else { alert('كلمة المرور غير صحيحة!'); return; }
+            } else {
+                currentUser = { phone: phone, role: 'user' };
+            }
+            sessionStorage.setItem('elaf_active_user', JSON.stringify(currentUser));
+            toggleAuthModal();
+            checkUserStatus();
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            sessionStorage.removeItem('elaf_active_user');
+            checkUserStatus();
+        }
+
+        function switchAdminTab(tab) {
+            ['prod', 'manage', 'orders', 'returns'].forEach(t => {
+                document.getElementById(`admin-${t}-tab`).classList.add('hidden');
+                document.getElementById(`tab-${t}-btn`).className = "bg-gray-100 dark:bg-forest-800 p-2 rounded-lg font-bold flex justify-center items-center gap-1 transition-all";
+            });
+            document.getElementById(`admin-${tab}-tab`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}-btn`).className = "bg-emeraldBrand text-white p-2 rounded-lg font-bold flex justify-center items-center gap-1 transition-all";
+            if(tab === 'manage') renderManageProducts();
+            if(tab === 'orders') renderOrders();
+            if(tab === 'returns') renderAdminReturnsList();
+        }
+
+        // ================== [ كود تعديل بيانات وحساب المالك المحدث ] ==================
+        function saveNewOwnerPhone() {
+            const newPhone = document.getElementById('new-owner-self-phone').value.replace(/\s+/g, '');
+            if (!newPhone) { alert('يرجى إدخال رقم هاتف صحيح!'); return; }
+            if (ownersList.includes(newPhone)) { alert('هذا الرقم مسجل بالفعل كمالك!'); return; }
+
+            if (confirm(`هل أنت متأكد من تغيير رقم هاتفك الحالي من [ ${currentUser.phone} ] إلى [ ${newPhone} ]؟`)) {
+                // استبدال الرقم القديم بالجديد في مصفوفة الملاك
+                const index = ownersList.indexOf(currentUser.phone);
+                if (index > -1) {
+                    ownersList[index] = newPhone;
+                } else {
+                    ownersList.push(newPhone);
+                }
+                
+                // تحديث المالك الرئيسي وتخزينه
+                PRIMARY_OWNER = ownersList[0];
+                localStorage.setItem('elaf_owners_list', JSON.stringify(ownersList));
+                
+                // تحديث الجلسة الحالية للمستخدم حتى لا يتم طرده
+                currentUser.phone = newPhone;
+                sessionStorage.setItem('elaf_active_user', JSON.stringify(currentUser));
+                
+                alert('🟢 تم تحديث رقم هاتف المالك بنجاح!');
+                document.getElementById('new-owner-self-phone').value = '';
+                toggleSettingsModal();
+                checkUserStatus();
+            }
+        }
+
+        function toggleSettingsModal() { 
+            document.getElementById('settings-modal').classList.toggle('hidden'); 
+            document.getElementById('settings-modal').classList.toggle('flex'); 
+            if (currentUser) {
+                document.getElementById('new-owner-self-phone').placeholder = "رقمك الحالي: " + currentUser.phone;
+            }
+        }
+        
+        function saveNewPassword() { 
+            const newPass = document.getElementById('new-pass').value;
+            if(!newPass) { alert('الرجاء كتابة كلمة مرور صالحة.'); return; }
+            adminPassword = newPass; 
+            localStorage.setItem('elaf_admin_pass', adminPassword); 
+            alert('تم تغيير كلمة السر بنجاح!'); 
+            document.getElementById('new-pass').value = '';
+            toggleSettingsModal(); 
+        }
+
+        function addNewOwner() {
+            const np = document.getElementById('new-owner-phone').value.replace(/\s+/g, ''); 
+            if(!np) return;
+            if(ownersList.includes(np)) { alert('هذا الرقم لديه صلاحيات بالفعل!'); return; }
+            ownersList.push(np); 
+            localStorage.setItem('elaf_owners_list', JSON.stringify(ownersList)); 
+            alert('تمت إضافة المالك المسؤول الجديد بنجاح!');
+            document.getElementById('new-owner-phone').value = '';
+        }
+
+        // ================== [ كود المرتجعات ] ==================
+        function findUserOrdersForReturn() {
+            const phone = document.getElementById('return-search-phone').value.replace(/\s+/g, '');
+            if(!phone) { alert('يرجى كتابة رقم الهاتف للبحث عن طلباتك أولاً.'); return; }
+            
+            const userOrders = orders.filter(o => o.confirmPhone === phone);
+            const listContainer = document.getElementById('returnable-list');
+            
+            if(userOrders.length === 0) {
+                listContainer.innerHTML = `<p class="text-red-500 text-center py-2">لم نجد أي طلبات مسجلة لهذا الرقم!</p>`;
+                document.getElementById('returnable-orders-container').classList.remove('hidden');
+                document.getElementById('submit-return-form').classList.add('hidden');
+                return;
+            }
+
+            const now = Date.now();
+            const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+
+            listContainer.innerHTML = userOrders.map(o => {
+                const orderAgeMs = now - o.id;
+                const isExpired = orderAgeMs > sevenDaysInMs;
+                
+                return `
+                    <div class="p-2 border rounded-xl flex justify-between items-center bg-gray-50 dark:bg-forest-900/40 text-[11px]">
+                        <div class="text-right flex-1 pl-2">
+                            <div class="font-bold line-clamp-1">📦 ${o.product}</div>
+                            <div class="text-gray-400 text-[10px]">تاريخ الاستلام: ${o.date}</div>
+                        </div>
+                        ${isExpired ? 
+                            `<span class="text-red-500 font-bold text-[10px]">تجاوز 7 أيام ❌</span>` : 
+                            `<button onclick="selectProductForReturn('${o.id}', '${o.product}')" class="bg-emeraldBrand text-white px-2.5 py-1 rounded-lg font-bold text-[10px]">إرجاع السلعة</button>`
+                        }
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('returnable-orders-container').classList.remove('hidden');
+            document.getElementById('submit-return-form').classList.add('hidden');
+        }
+
+        function selectProductForReturn(orderId, productText) {
+            document.getElementById('selected-order-id').value = orderId;
+            document.getElementById('selected-product-text').value = productText;
+            document.getElementById('submit-return-form').classList.remove('hidden');
+            document.getElementById('submit-return-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function handleReturnFormSubmit(e) {
+            e.preventDefault();
+            const orderId = document.getElementById('selected-order-id').value;
+            const product = document.getElementById('selected-product-text').value;
+            const phone = document.getElementById('return-search-phone').value.replace(/\s+/g, '');
+            const reason = document.getElementById('return-reason').value;
+            const notes = document.getElementById('return-notes').value;
+
+            const newReturn = {
+                id: Date.now(),
+                orderId, product, phone, reason, notes,
+                status: 'pending',
+                date: new Date().toLocaleDateString('ar-EG')
+            };
+
+            returnRequests.unshift(newReturn);
+            localStorage.setItem('elaf_return_requests', JSON.stringify(returnRequests));
+            alert('🟢 تم إرسال طلب المرتجع بنجاح! سيتم مراجعته وتحديث طلبك.');
+            document.getElementById('submit-return-form').reset();
+            document.getElementById('returnable-orders-container').classList.add('hidden');
+            document.getElementById('submit-return-form').classList.add('hidden');
+            toggleDrawer('returns');
+            updateBadges();
+        }
+
+        function renderAdminReturnsList() {
+            document.getElementById('admin-returns-count').innerText = returnRequests.filter(r => r.status === 'pending').length;
+            const container = document.getElementById('admin-returns-list');
+            if (returnRequests.length === 0) { container.innerHTML = `<p class="text-gray-400 text-[11px] text-center py-4">لا توجد طلبات مرتجعات واردة...</p>`; return; }
+
+            container.innerHTML = returnRequests.map(r => {
+                let statusBadge = `<span class="text-amber-500 font-bold">[معلق]</span>`;
+                if(r.status === 'approved') statusBadge = `<span class="text-green-500 font-bold">[مقبول ✓]</span>`;
+                if(r.status === 'rejected') statusBadge = `<span class="text-red-500 font-bold">[مرفوض ✕]</span>`;
+
+                return `
+                <div class="p-3 bg-white dark:bg-forest-950 border rounded-xl text-[11px] text-right space-y-1 shadow-sm">
+                    <div class="flex justify-between font-bold">
+                        <span class="text-amber-600 dark:text-gold-400">🔄 منتج: ${r.product}</span>
+                        <span>${statusBadge}</span>
+                    </div>
+                    <div><strong>الهاتف:</strong> <span class="text-blue-500 font-mono">${r.phone}</span></div>
+                    <div><strong>السبب:</strong> ${r.reason === 'damaged' ? 'تالف' : r.reason === 'wrong' ? 'منتج خاطئ' : 'لم يعجبه'}</div>
+                    <div class="text-gray-400"><strong>ملاحظات:</strong> ${r.notes || 'لا يوجد'}</div>
+                    ${r.status === 'pending' ? `
+                    <div class="flex gap-2 pt-1 justify-end">
+                        <button onclick="updateReturnStatus(${r.id}, 'approved')" class="bg-green-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold">موافقة</button>
+                        <button onclick="updateReturnStatus(${r.id}, 'rejected')" class="bg-red-500 text-white px-3 py-1 rounded-lg text-[10px] font-bold">رفض</button>
+                    </div>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        function updateReturnStatus(id, newStatus) {
+            const req = returnRequests.find(r => r.id === id);
+            if(req) {
+                req.status = newStatus;
+                localStorage.setItem('elaf_return_requests', JSON.stringify(returnRequests));
+                renderAdminReturnsList();
+            }
+        }
+
+        // ================== [ بقية وظائف السلة والمنتجات والطلبات ] ==================
+        function handleProductSubmit(e) {
+            e.preventDefault();
+            const editId = document.getElementById('edit-product-id').value;
+            const title = document.getElementById('p-title').value;
+            const desc = document.getElementById('p-desc').value;
+            const price = Number(document.getElementById('p-price').value);
+            const fileInput = document.getElementById('p-file');
+
+            if (editId) {
+                const prodIndex = products.findIndex(p => p.id === Number(editId));
+                if (prodIndex > -1) {
+                    products[prodIndex].title = title; products[prodIndex].desc = desc; products[prodIndex].price = price;
+                    if (fileInput.files && fileInput.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) { products[prodIndex].img = event.target.result; saveAndSyncProducts(); cancelEditMode(); };
+                        reader.readAsDataURL(fileInput.files[0]);
+                    } else { saveAndSyncProducts(); cancelEditMode(); }
+                }
+            } else {
+                if (fileInput.files && fileInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        products.push({ id: Date.now(), title, desc, price, img: event.target.result });
+                        saveAndSyncProducts(); document.getElementById('add-product-form').reset();
+                    };
+                    reader.readAsDataURL(fileInput.files[0]);
+                } else { alert('يرجى اختيار صورة للمنتج!'); }
+            }
+        }
+
+        function saveAndSyncProducts() {
+            localStorage.setItem('elaf_products', JSON.stringify(products));
+            renderProducts(products); renderManageProducts();
+        }
+
+        function startEditProduct(id) {
+            const prod = products.find(p => p.id === id); if (!prod) return;
+            switchAdminTab('prod');
+            document.getElementById('edit-product-id').value = prod.id;
+            document.getElementById('p-title').value = prod.title;
+            document.getElementById('p-desc').value = prod.desc;
+            document.getElementById('p-price').value = prod.price;
+            document.getElementById('form-submit-btn').innerText = "تحديث بيانات المنتج الحالي";
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+        }
+
+        function cancelEditMode() {
+            document.getElementById('edit-product-id').value = ""; document.getElementById('add-product-form').reset();
+            document.getElementById('form-submit-btn').innerText = "حفظ ونشر المنتج في المتجر";
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+        }
+
+        function deleteProduct(id) {
+            if (confirm('هل أنت متأكد من حذف المنتج؟')) {
+                products = products.filter(p => p.id !== id); saveAndSyncProducts();
+            }
+        }
+
+        function renderManageProducts() {
+            const container = document.getElementById('manage-products-list');
+            if (products.length === 0) { container.innerHTML = `<p class="text-center py-4 text-xs">لا توجد منتجات...</p>`; return; }
+            container.innerHTML = products.map(p => `
+                <div class="flex gap-3 bg-white dark:bg-forest-950 p-2 rounded-xl items-center justify-between border dark:border-forest-900 text-[11px]">
+                    <img src="${p.img}" class="w-10 h-10 object-cover rounded-lg">
+                    <div class="flex-1 text-right"><h4 class="font-bold line-clamp-1">${p.title}</h4><span class="text-emeraldBrand font-mono">${p.price} ج.م</span></div>
+                    <div class="flex gap-1">
+                        <button onclick="startEditProduct(${p.id})" class="bg-blue-500 text-white px-2 py-1 rounded-lg">تعديل</button>
+                        <button onclick="deleteProduct(${p.id})" class="bg-red-500 text-white px-2 py-1 rounded-lg">حذف</button>
+                    </div>
+                </div>`).join('');
+        }
+
+        function filterProducts(query) {
+            renderProducts(products.filter(p => p.title.toLowerCase().includes(query.toLowerCase())));
+        }
+
+        function toggleDrawer(type) {
+            const drawer = document.getElementById(`${type}-drawer`);
+            if (drawer.classList.contains('translate-x-full')) {
+                ['fav', 'cart', 'returns'].forEach(t => document.getElementById(`${t}-drawer`).classList.add('translate-x-full'));
+                drawer.classList.remove('translate-x-full');
+                if (type === 'cart') renderCart();
+                if (type === 'fav') renderFav();
+            } else { drawer.classList.add('translate-x-full'); }
+        }
+
+        function toggleFavorite(id) {
+            const idx = favItems.indexOf(id); if (idx > -1) favItems.splice(idx, 1); else favItems.push(id);
+            localStorage.setItem('elaf_fav_items', JSON.stringify(favItems)); updateBadges(); renderProducts(products);
+        }
+
+        function addToCart(id) {
+            const product = products.find(p => p.id === id); if (!product) return;
+            const existing = cartItems.find(item => item.id === id);
+            if (existing) existing.qty += 1; else cartItems.push({ id: product.id, title: product.title, price: product.price, img: product.img, qty: 1 });
+            localStorage.setItem('elaf_cart_items', JSON.stringify(cartItems)); updateBadges();
+        }
+
+        function updateBadges() {
+            document.getElementById('cart-badge').innerText = cartItems.reduce((a, b) => a + b.qty, 0);
+            document.getElementById('cart-badge').classList.toggle('hidden', cartItems.length === 0);
+            document.getElementById('fav-badge').innerText = favItems.length;
+            document.getElementById('fav-badge').classList.toggle('hidden', favItems.length === 0);
+            document.getElementById('admin-returns-count').innerText = returnRequests.filter(r => r.status === 'pending').length;
+        }
+
+        function renderProducts(itemsList) {
+            const container = document.getElementById('products-container'); container.innerHTML = '';
+            if (itemsList.length === 0) { document.getElementById('no-products-msg').classList.remove('hidden'); return; }
+            document.getElementById('no-products-msg').classList.add('hidden');
+            itemsList.forEach(p => {
+                const isFav = favItems.includes(p.id);
+                container.innerHTML += `
+                    <div class="bg-white dark:bg-forest-900 border border-gray-100 dark:border-forest-900/60 rounded-[24px] overflow-hidden shadow-sm flex flex-col justify-between relative">
+                        <div><img src="${p.img}" class="w-full h-44 object-cover"><button onclick="toggleFavorite(${p.id})" class="absolute top-2 right-2 bg-white/90 dark:bg-forest-950/90 p-1.5 rounded-full text-xs">${isFav ? '❤️' : '🤍'}</button>
+                        <div class="p-3"><h4 class="font-bold text-xs line-clamp-1">${p.title}</h4><p class="text-[10px] text-gray-400 line-clamp-2 mt-0.5">${p.desc}</p></div></div>
+                        <div class="p-3 pt-0 flex justify-between items-center"><span class="text-[11px] font-extrabold text-emeraldBrand dark:text-gold-400 font-mono">${p.price} ج.م</span>
+                        <button onclick="addToCart(${p.id})" class="bg-emeraldBrand dark:bg-gold-500 text-white dark:text-forest-950 w-7 h-7 rounded-full font-bold text-sm">+</button></div>
+                    </div>`;
+            });
+        }
+
+        function renderFav() {
+            const container = document.getElementById('fav-items-container'); const filtered = products.filter(p => favItems.includes(p.id));
+            if (filtered.length === 0) { container.innerHTML = '<p class="text-xs text-gray-400 py-12 text-center">المفضلة فارغة...</p>'; return; }
+            container.innerHTML = filtered.map(p => `<div class="flex gap-3 bg-gray-50 dark:bg-forest-900 p-2 rounded-xl items-center justify-between border dark:border-forest-800"><img src="${p.img}" class="w-12 h-12 object-cover rounded-lg"><div class="flex-1 text-xs text-right"><h4 class="font-bold">${p.title}</h4><span class="text-emeraldBrand font-bold">${p.price} ج.م</span></div><button onclick="toggleFavorite(${p.id}); renderFav();" class="text-xs p-2">❌</button></div>`).join('');
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items-container'); container.innerHTML = '';
+            if (cartItems.length === 0) { container.innerHTML = '<p class="text-xs text-gray-400 py-12 text-center">السلة فارغة...</p>'; document.getElementById('cart-total-price').innerText = '0 ج.م'; return; }
+            let total = 0;
+            cartItems.forEach(item => {
+                total += (item.price * item.qty);
+                container.innerHTML += `
+                    <div class="flex gap-3 bg-gray-50 dark:bg-forest-900 p-2 rounded-xl items-center justify-between border dark:border-forest-800"><img src="${item.img}" class="w-12 h-12 object-cover rounded-lg"><div class="flex-1 text-xs text-right"><h4 class="font-bold">${item.title}</h4><span class="text-emeraldBrand font-mono">${item.price} ج.م × ${item.qty}</span></div>
+                    <div class="flex items-center gap-1"><button onclick="changeQty(${item.id}, -1)" class="bg-gray-200 dark:bg-forest-800 w-5 h-5 rounded text-xs">-</button><button onclick="changeQty(${item.id}, 1)" class="bg-gray-200 dark:bg-forest-800 w-5 h-5 rounded text-xs">+</button></div></div>`;
+            });
+            document.getElementById('cart-total-price').innerText = `${total} ج.م`;
+        }
+
+        function changeQty(id, delta) {
+            const item = cartItems.find(i => i.id === id); if (!item) return; item.qty += delta;
+            if (item.qty <= 0) cartItems = cartItems.filter(i => i.id !== id); localStorage.setItem('elaf_cart_items', JSON.stringify(cartItems)); updateBadges(); renderCart();
+        }
+
+        function openCheckoutFromCart() {
+            if (!currentUser) { alert('يرجى تسجيل الدخول برقم الهاتف لتأكيد شحن طلبك.'); toggleAuthModal(); return; }
+            if (cartItems.length === 0) return;
+            document.getElementById('target-product-details').innerText = cartItems.map(i => `${i.title} (${i.qty})`).join('، ') + ` | إجمالي: ${cartItems.reduce((a,b)=>a+(b.price*b.qty),0)} ج.م`;
+            document.getElementById('order-phone').value = currentUser.phone; toggleDrawer('cart'); toggleOrderModal();
+        }
+
+        function toggleOrderModal() { document.getElementById('order-modal').classList.toggle('hidden'); document.getElementById('order-modal').classList.toggle('flex'); }
+
+        function submitOrder(e) {
+            e.preventDefault();
+            const order = { id: Date.now(), product: document.getElementById('target-product-details').innerText, price: cartItems.reduce((a,b)=>a+(b.price*b.qty),0), address: document.getElementById('order-address').value, confirmPhone: document.getElementById('order-phone').value, date: new Date().toLocaleDateString('ar-EG') + " " + new Date().toLocaleTimeString('ar-EG') };
+            orders.unshift(order); localStorage.setItem('elaf_orders', JSON.stringify(orders));
+            cartItems = []; localStorage.setItem('elaf_cart_items', JSON.stringify(cartItems)); updateBadges(); alert('تم إرسال طلبك الأصيل بنجاح!'); toggleOrderModal();
+        }
+
+        function renderOrders() {
+            document.getElementById('order-count').innerText = orders.length;
+            const container = document.getElementById('orders-list'); if (orders.length === 0) { container.innerHTML = `<p class="text-xs text-center py-4">لا توجد طلبات...</p>`; return; }
+            container.innerHTML = orders.map(o => `
+                <div class="p-3 bg-white dark:bg-forest-950 border rounded-xl text-[11px] text-right space-y-1">
+                    <div class="flex justify-between font-bold text-emeraldBrand"><span>📦 ${o.product}</span><span>${o.price} ج.م</span></div>
+                    <div><strong>العنوان:</strong> ${o.address} | <strong>الهاتف:</strong> <span class="text-blue-500 font-mono">${o.confirmPhone}</span></div>
+                    <div class="text-[9px] text-gray-400">تاريخ الطلب: ${o.date}</div>
+                </div>`).join('');
+        }
+    </script>
+</body>
+</html>
