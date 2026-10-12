@@ -61,15 +61,26 @@ function showStatus(id,msg,error=false){const el=$(id);if(el){el.textContent=msg
 let authMode='login';
 function setAuthMode(mode){
  authMode=mode;
- const owner=mode==='owner';
- const signup=mode==='signup';
- $('#auth-name-field')?.classList.toggle('active',signup && !owner);
+ const owner=mode==='owner'||mode==='owner-signup';
+ const signup=mode==='signup'||mode==='owner-signup';
+ const field=$('#auth-phone');
+ const label=field?.closest('.field')?.querySelector('label');
+ if(field){
+   field.type=owner?'email':'tel';
+   field.inputMode=owner?'email':'tel';
+   field.autocomplete=owner?'email':'tel';
+   field.placeholder=owner?'البريد الإلكتروني للمالك':'01000000000';
+   field.setAttribute('aria-label',owner?'البريد الإلكتروني للمالك':'رقم الموبايل');
+ }
+ if(label)label.textContent=owner?'البريد الإلكتروني':'رقم الموبايل';
+ $('#auth-name-field')?.classList.toggle('active',signup);
  $('#auth-submit').textContent=signup?'إنشاء الحساب':'دخول';
- $('#auth-title').textContent=owner?'دخول المالك':(signup?'اعمل حسابك.':'أهلاً بيك.');
- $('#auth-subtitle').textContent=owner?'استخدم حساب المالك الموجود في Supabase Auth.':(signup?'اكتب اسمك ورقم الموبايل وكلمة المرور.':'اكتب رقم الموبايل وكلمة المرور للدخول.');
+ $('#auth-title').textContent=owner?(signup?'إنشاء حساب المالك':'دخول المالك'):(signup?'اعمل حسابك.':'أهلاً بيك.');
+ $('#auth-subtitle').textContent=owner?'استخدم البريد الإلكتروني وكلمة المرور. لا نحتاج SMS.':(signup?'اكتب اسمك ورقم الموبايل وكلمة المرور.':'اكتب رقم الموبايل أو البريد الإلكتروني وكلمة المرور.');
  $('#auth-mode-btn').textContent=signup?'عندي حساب بالفعل':'أنا عميل جديد';
  $('#auth-mode-btn').style.display=owner?'none':'';
- $('#signup-btn').style.display=''; $('#signup-btn').textContent=owner?'إنشاء حساب لأول مرة':'إنشاء حساب';
+ $('#signup-btn').style.display='';
+ $('#signup-btn').textContent=owner?'إنشاء حساب المالك لأول مرة':'إنشاء حساب';
  $('#auth-password').setAttribute('autocomplete',signup?'new-password':'current-password');
 }
 function openAuth(mode='login'){
@@ -79,43 +90,62 @@ function openAuth(mode='login'){
 }
 function closeAuth(){const m=$('#auth-modal');if(!m)return;m.classList.remove('open');m.setAttribute('aria-hidden','true')}
 $$('[data-close-auth]').forEach(x=>x.addEventListener('click',closeAuth));
-$('#auth-mode-btn')?.addEventListener('click',()=>setAuthMode(authMode==='login'?'signup':'login'));
+$('#auth-mode-btn')?.addEventListener('click',()=>setAuthMode(authMode==='signup'?'login':'signup'));
+$('#owner-login-btn')?.addEventListener('click',()=>setAuthMode('owner'));
 const authPhone=$('#auth-phone'),passField=$('#password-field');
 authPhone?.addEventListener('input',()=>{
- const digits=authPhone.value.replace(/\D/g,'');
+ if(authMode==='owner'||authMode==='owner-signup')return;
  const isOwnerPhone=normalizePhone(authPhone.value)==='+201000807105';
- if(isOwnerPhone&&authMode!=='owner')setAuthMode('owner');
- else if(!isOwnerPhone&&authMode==='owner')setAuthMode('login');
- passField?.classList.toggle('show',/^01\d{9}$/.test(digits)||isOwnerPhone);
+ if(isOwnerPhone){
+   setAuthMode('owner');
+   authPhone.value='';
+   showStatus('#auth-status','أدخل البريد الإلكتروني للمالك ثم كلمة المرور.');
+ }
+ passField?.classList.toggle('show',!!authPhone.value);
 });
 $('#auth-form')?.addEventListener('submit',async e=>{
  e.preventDefault();
- const phone=normalizePhone(authPhone.value),password=$('#auth-password').value.trim(),name=$('#auth-name').value.trim();
- if(!/^\+20\d{10}$/.test(phone))return showStatus('#auth-status','اكتب رقم موبايل مصري صحيح.',true);
+ const identifier=authPhone.value.trim(),password=$('#auth-password').value.trim(),name=$('#auth-name').value.trim();
+ const owner=authMode==='owner'||authMode==='owner-signup';
+ const signup=authMode==='signup'||authMode==='owner-signup';
+ if(owner){
+   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier))return showStatus('#auth-status','اكتب بريدًا إلكترونيًا صحيحًا للمالك.',true);
+ }else if(!/^\+20\d{10}$/.test(normalizePhone(identifier))){
+   return showStatus('#auth-status','اكتب رقم موبايل مصري صحيح، أو اختر دخول المالك بالبريد الإلكتروني.',true);
+ }
  if(password.length<6)return showStatus('#auth-status','كلمة المرور لازم تكون 6 أحرف أو أرقام على الأقل.',true);
- if(authMode==='signup'&&!name)return showStatus('#auth-status','اكتب اسمك الأول.',true);
- showStatus('#auth-status',authMode==='signup'?'جاري إنشاء الحساب...':'جاري تسجيل الدخول...');
- if(authMode==='signup'){
-   const {data,error}=await sb.auth.signUp({phone,password,options:{data:{full_name:name}}});
+ if(signup&&!owner&&!name)return showStatus('#auth-status','اكتب اسمك الأول.',true);
+ showStatus('#auth-status',signup?'جاري إنشاء الحساب...':'جاري تسجيل الدخول...');
+ if(signup){
+   const options={data:{full_name:owner?(name||'المالك'):name, ...(owner?{phone:'+201000807105'}:{})}};
+   const payload=owner?{email:identifier,password,options}:{phone:normalizePhone(identifier),password,options};
+   const {data,error}=await sb.auth.signUp(payload);
    if(error)return showStatus('#auth-status',error.message||'تعذر إنشاء الحساب.',true);
    if(data.user){
-     if(data.session){closeAuth();await refreshApp();location.hash='#account'}
-     else showStatus('#auth-status','تم إنشاء الحساب. لو التحقق بالرسائل مفعّل، أكّد الرقم ثم سجّل الدخول.');
+     if(data.session){
+       closeAuth();await refreshApp();
+       if(owner)showStatus('#auth-status','تم إنشاء الحساب. يلزم تفعيل صلاحية المالك بأمان قبل ظهور لوحة الإدارة.');
+       else location.hash='#account';
+     }else{
+       showStatus('#auth-status',owner?'تم إنشاء الحساب. افتح رسالة التأكيد في بريدك الإلكتروني، ثم أرسل لي البريد المستخدم لأضبط صلاحية المالك.':'تم إنشاء الحساب. لو التحقق مفعّل، راجع رسالة التأكيد ثم سجّل الدخول.');
+     }
    }
  }else{
-   const {data,error}=await sb.auth.signInWithPassword({phone,password});
-   if(error)return showStatus('#auth-status','بيانات الدخول غير صحيحة.',true);
-   if(authMode==='owner'){
+   const payload=owner?{email:identifier,password}:{phone:normalizePhone(identifier),password};
+   const {data,error}=await sb.auth.signInWithPassword(payload);
+   if(error)return showStatus('#auth-status','بيانات الدخول غير صحيحة أو الحساب غير مؤكّد.',true);
+   if(owner){
      const {data:profile,error:profileError}=await sb.from('profiles').select('role').eq('id',data.user.id).maybeSingle();
      if(profileError||profile?.role!=='admin'){
        await sb.auth.signOut(); currentUser=null; currentProfile=null; showPrivateSections(); renderAuthButton();
-       return showStatus('#auth-status','هذا الحساب ليس حساب المالك.',true);
+       return showStatus('#auth-status','تم الدخول لكن هذا الحساب لم يحصل على صلاحية المالك بعد.',true);
      }
    }
    closeAuth();await refreshApp();location.hash=currentProfile?.role==='admin'?'#dashboard':'#account';
  }
 });
-$('#signup-btn')?.addEventListener('click',()=>setAuthMode('signup'));
+$('#signup-btn')?.addEventListener('click',()=>setAuthMode(authMode==='owner'?'owner-signup':authMode==='owner-signup'?'owner':'signup'));
+
 
 $('#logout-btn')?.addEventListener('click',async()=>{await sb.auth.signOut();currentUser=null;currentProfile=null;showPrivateSections();renderAuthButton();location.hash='#top'});
 $('#change-password-btn')?.addEventListener('click',async()=>{
