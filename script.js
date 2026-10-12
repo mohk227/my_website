@@ -82,6 +82,7 @@ function setAuthMode(mode){
  $('#signup-btn').style.display='';
  $('#signup-btn').textContent=owner?'إنشاء حساب المالك لأول مرة':'إنشاء حساب';
  $('#auth-password').setAttribute('autocomplete',signup?'new-password':'current-password');
+ $('#password-field')?.classList.toggle('show',owner||signup||!!field?.value);
 }
 function openAuth(mode='login'){
  const m=$('#auth-modal');if(!m)return;
