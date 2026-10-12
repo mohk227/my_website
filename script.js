@@ -123,9 +123,12 @@ $('#auth-form')?.addEventListener('submit',async e=>{
    if(error)return showStatus('#auth-status',error.message||'تعذر إنشاء الحساب.',true);
    if(data.user){
      if(data.session){
-       closeAuth();await refreshApp();
-       if(owner)showStatus('#auth-status','تم إنشاء الحساب. يلزم تفعيل صلاحية المالك بأمان قبل ظهور لوحة الإدارة.');
-       else location.hash='#account';
+       if(owner){
+         await sb.auth.signOut();
+         showStatus('#auth-status','تم إنشاء الحساب. أرسل لي البريد الإلكتروني الذي استخدمته لأفعّل صلاحية المالك بأمان.');
+       }else{
+         closeAuth();await refreshApp();location.hash='#account';
+       }
      }else{
        showStatus('#auth-status',owner?'تم إنشاء الحساب. افتح رسالة التأكيد في بريدك الإلكتروني، ثم أرسل لي البريد المستخدم لأضبط صلاحية المالك.':'تم إنشاء الحساب. لو التحقق مفعّل، راجع رسالة التأكيد ثم سجّل الدخول.');
      }
