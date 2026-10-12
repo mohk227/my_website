@@ -83,7 +83,10 @@ $('#auth-mode-btn')?.addEventListener('click',()=>setAuthMode(authMode==='login'
 const authPhone=$('#auth-phone'),passField=$('#password-field');
 authPhone?.addEventListener('input',()=>{
  const digits=authPhone.value.replace(/\D/g,'');
- passField?.classList.toggle('show',/^01\d{9}$/.test(digits));
+ const isOwnerPhone=normalizePhone(authPhone.value)==='+201000807105';
+ if(isOwnerPhone&&authMode!=='owner')setAuthMode('owner');
+ else if(!isOwnerPhone&&authMode==='owner')setAuthMode('login');
+ passField?.classList.toggle('show',/^01\d{9}$/.test(digits)||isOwnerPhone);
 });
 $('#auth-form')?.addEventListener('submit',async e=>{
  e.preventDefault();
@@ -141,7 +144,7 @@ renderCart();
 function addTopControls(){
  const header=$('.site-header'); if(!header)return;
  const controls=document.createElement('div');controls.className='site-controls';
- controls.innerHTML='<button class="control-btn" id="theme-btn" type="button" aria-label="تغيير المظهر">☾</button><button class="control-btn" id="owner-btn" type="button">المالك</button><button class="control-btn" id="account-btn" type="button">حسابي</button>';
+ controls.innerHTML='<button class="control-btn" id="theme-btn" type="button" aria-label="تغيير المظهر">☾</button><button class="control-btn" id="account-btn" type="button">دخول</button>';
  header.insertBefore(controls,menu||header.lastChild);
  $('#theme-btn')?.addEventListener('click',()=>{
   document.documentElement.classList.toggle('light-mode');
@@ -149,7 +152,6 @@ function addTopControls(){
   $('#theme-btn').textContent=document.documentElement.classList.contains('light-mode')?'☀':'☾';
  });
  $('#account-btn')?.addEventListener('click',()=>currentUser?location.hash='#account':openAuth('login'));
- $('#owner-btn')?.addEventListener('click',()=>openAuth('owner'));
  if(localStorage.getItem('washing-theme')==='light'){document.documentElement.classList.add('light-mode');$('#theme-btn').textContent='☀'}
 }
 addTopControls();
