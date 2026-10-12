@@ -69,7 +69,7 @@ function setAuthMode(mode){
  $('#auth-subtitle').textContent=owner?'استخدم حساب المالك الموجود في Supabase Auth.':(signup?'اكتب اسمك ورقم الموبايل وكلمة المرور.':'اكتب رقم الموبايل وكلمة المرور للدخول.');
  $('#auth-mode-btn').textContent=signup?'عندي حساب بالفعل':'أنا عميل جديد';
  $('#auth-mode-btn').style.display=owner?'none':'';
- $('#signup-btn').style.display=owner?'none':'';
+ $('#signup-btn').style.display=''; $('#signup-btn').textContent=owner?'إنشاء حساب لأول مرة':'إنشاء حساب';
  $('#auth-password').setAttribute('autocomplete',signup?'new-password':'current-password');
 }
 function openAuth(mode='login'){
